@@ -1,0 +1,58 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+ENV/
+
+# Models and caches (large files)
+/models/
+/whisper_models/
+*.gguf
+*.safetensors
+*.bin
+*.pt
+
+# Docker overrides
+docker-compose.override.yml
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Build
+dist/
+build/
+
+# Caches
+.mypy_cache/
+.pytest_cache/
+.cache/
+
+# OS files
+.DS_Store
+
+# Databases
+*.sqlite3
+*.db
+
+# Temp
+*.swp
+*~
