@@ -3,11 +3,20 @@ services:
     build: ./stt
     env_file: .env
     volumes:
-      - ./whisper_models:/root/.cache/whisper
+      - ./models/whisper_models:/app/models/whisper_models
     ports:
       - "3000:3000"
+    # --- AJOUT INDISPENSABLE POUR LE GPU ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # ---------------------------------------
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"] # ton endpoint santé
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 5s
       timeout: 2s
       retries: 10

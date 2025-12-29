@@ -3,4 +3,7 @@ uvicorn
 python-multipart
 faster-whisper
 numpy
-dotenv
+python-dotenv
+# Bibliothèques de calcul NVIDIA
+nvidia-cublas-cu12
+nvidia-cudnn-cu12
