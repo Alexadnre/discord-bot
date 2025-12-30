@@ -6,7 +6,6 @@ services:
       - ./models/whisper_models:/app/models/whisper_models
     ports:
       - "3000:3000"
-    # --- AJOUT INDISPENSABLE POUR LE GPU ---
     deploy:
       resources:
         reservations:
@@ -14,12 +13,38 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    # ---------------------------------------
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 5s
-      timeout: 2s
+      interval: 10s # Un peu plus souple pour laisser charger le GPU
+      timeout: 5s
+      retries: 5
+    depends_on:
+      llm:
+        condition: service_healthy
+
+  llm:
+    build: ./llm
+    container_name: bobby-llm
+    volumes:
+      - ./models:/models
+    environment:
+      - MODEL_PATH=/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+      - LLM_THREADS=4
+      - N_GPU_LAYERS=33 # Pour forcer l'usage du GPU
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      # Utilise Python pour tester le port au lieu de curl
+      test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect(('localhost', 8000))"]
+      interval: 10s
+      timeout: 5s
       retries: 10
+      start_period: 60s # On laisse 60s pour charger le modèle tranquillement
 
   bot:
     build: ./bot
@@ -27,3 +52,8 @@ services:
     depends_on:
       stt:
         condition: service_healthy
+      llm:
+        condition: service_healthy
+    environment:
+      - STT_URL=http://stt:3000/transcribe
+      - LLM_URL=http://llm:8000/generate
